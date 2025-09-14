@@ -53,7 +53,7 @@ export interface TodoEntity {
   title: string;
   description?: string;
   priority: Priority;
-  startDate: number;
+  startDate?: number;
   dueDate?: number;
   tagIds?: string[];
   createdAt: number;
