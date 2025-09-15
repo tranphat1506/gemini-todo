@@ -21,7 +21,10 @@ import {
 import { getContrastColor } from "@/utils/color";
 const Avatar = lazy(() => import("@/components/Avatar"));
 import { useAppDispatch } from "@/hooks/storeHooks";
-import { showTagDetails } from "@/features/ui/rightSidebar.slice";
+import {
+  showTagDetails,
+  showProjectDetails,
+} from "@/features/ui/rightSidebar.slice";
 import type {
   ReminderViewModel,
   TagEntity,
@@ -31,6 +34,7 @@ import {
   toReminderViewModel,
   toTodoViewModel,
 } from "@/features/todos/utils/mappers";
+
 interface SideBarProps {
   className?: string;
 }
@@ -50,6 +54,7 @@ const SideBar: React.FC<SideBarProps> = ({ className }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAppSelector((state) => state.auth);
+  const { content } = useAppSelector((state) => state.rightSidebar); // Lấy content từ rightSidebar
   const [isCollapsed, setIsCollapsed] = useState(false);
   const tags = useMemo(() => {
     return mockTags;
@@ -61,6 +66,7 @@ const SideBar: React.FC<SideBarProps> = ({ className }) => {
   const allReminders = useMemo(() => {
     return createMockReminders(10);
   }, []);
+
   const handleTagClick = (tag: TagEntity) => {
     const todosWithTag: TodoViewModel[] = allTodos.todos
       .filter((t) => t.tagIds?.includes(tag.id))
@@ -77,6 +83,23 @@ const SideBar: React.FC<SideBarProps> = ({ className }) => {
       })
     );
   };
+
+  const handleProjectClick = (projectId: string) => {
+    const project = mockProjects.find((p) => p.id === projectId);
+    if (!project) return;
+
+    const todosInProject: TodoViewModel[] = allTodos.todos
+      .filter((t) => t.projectId === projectId)
+      .map((t) => toTodoViewModel(t, allTodos.tasks, mockTags, mockProjects));
+
+    dispatch(
+      showProjectDetails({
+        project,
+        todos: todosInProject,
+      })
+    );
+  };
+
   return (
     <div
       className={clsx(
@@ -160,10 +183,13 @@ const SideBar: React.FC<SideBarProps> = ({ className }) => {
             PROJECTS {`(${mockProjects.length})`}
           </h3>
           {mockProjects.map((project) => {
-            const isActive = location.pathname === "/todos";
+            // Logic isActive dựa trên rightsidebar.projectId
+            const isActive =
+              content.type === "project" && content.project?.id === project.id;
             return (
               <button
                 key={project.id}
+                onClick={() => handleProjectClick(project.id)}
                 className="flex items-center gap-3 py-2 font-medium hover:bg-neutral-800"
               >
                 <div className="flex justify-start items-center">
@@ -171,7 +197,10 @@ const SideBar: React.FC<SideBarProps> = ({ className }) => {
                     <div className="h-6 w-0.5 rounded-full bg-green-400" />
                   )}
                   <div
-                    className="w-4 h-4 rounded-full ml-6"
+                    className={clsx(
+                      "w-4 h-4 rounded-full",
+                      isActive ? "ml-6" : "ml-6"
+                    )}
                     style={{
                       backgroundColor: project.color,
                       border: `1px solid ${getContrastColor(project.color)}`,
@@ -179,7 +208,11 @@ const SideBar: React.FC<SideBarProps> = ({ className }) => {
                   />
                 </div>
 
-                <span>{project.projectName}</span>
+                <span
+                  className={clsx(isActive ? "text-white" : "text-gray-400")}
+                >
+                  {project.projectName}
+                </span>
               </button>
             );
           })}
@@ -218,7 +251,7 @@ const SideBar: React.FC<SideBarProps> = ({ className }) => {
             isCollapsed ? "justify-center" : ""
           )}
         >
-          <RiSettings3Line size={"1.25rem"} />
+          <RiSettings3Line size="1.25rem" />
           {!isCollapsed && <span>Settings</span>}
         </button>
 
@@ -228,8 +261,8 @@ const SideBar: React.FC<SideBarProps> = ({ className }) => {
             isCollapsed ? "justify-center" : ""
           )}
         >
-          <RiQuestionLine size={"1.25rem"} />
-          {!isCollapsed && <span>FAQs</span>}
+          <RiQuestionLine size="1.25rem" />
+          {!isCollapsed && <span>Help</span>}
         </button>
 
         {/* Avatar Card */}

@@ -96,20 +96,23 @@ const RightSideBar: React.FC<RightSideBarProps> = ({ className }) => {
         >
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-neutral-800">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 flex-1 min-w-0">
               {history.length > 0 && (
                 <IconButton
                   icon={<RiArrowLeftLine size="1.25rem" />}
                   onClick={handleGoBack}
-                  className="text-gray-400 hover:text-white"
+                  className="text-gray-400 hover:text-white flex-shrink-0"
                 />
               )}
-              <h2 className="text-lg font-semibold truncate">{getTitle()}</h2>
+              {/* Title với wrap */}
+              <h2 className="text-lg font-semibold leading-tight break-words min-w-0 flex-1">
+                {getTitle()}
+              </h2>
             </div>
             <IconButton
               icon={<RiCloseLine size="1.5rem" />}
               onClick={handleClose}
-              className="text-gray-400 hover:text-white"
+              className="text-gray-400 hover:text-white flex-shrink-0"
             />
           </div>
 

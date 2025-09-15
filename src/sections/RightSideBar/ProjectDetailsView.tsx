@@ -26,6 +26,17 @@ const ProjectDetailsView: React.FC<ProjectDetailsViewProps> = ({
     dispatch(showTodoDetails(todo));
   };
 
+  // Cập nhật formatDateTime với HH:mm
+  const formatDateTime = (timestamp: number) => {
+    return new Date(timestamp).toLocaleString("vi-VN", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
   const formatDate = (timestamp: number) => {
     return new Date(timestamp).toLocaleDateString("vi-VN", {
       day: "2-digit",
@@ -80,41 +91,47 @@ const ProjectDetailsView: React.FC<ProjectDetailsViewProps> = ({
     <div className="space-y-6">
       {/* Project Header */}
       <div className="space-y-4">
-        <div className="flex items-center gap-3">
+        <div className="flex items-start gap-3">
           <div
-            className="w-6 h-6 rounded-full flex-shrink-0"
+            className="w-6 h-6 rounded-full mt-1 flex-shrink-0"
             style={{
               backgroundColor: project.color,
               border: `2px solid ${getContrastColor(project.color)}`,
             }}
           />
-          <h1 className="text-xl font-bold text-white">
-            {project.projectName}
-          </h1>
+          <div className="flex-1 min-w-0">
+            <h1 className="text-xl font-bold text-white leading-tight break-words">
+              {project.projectName}
+            </h1>
+          </div>
         </div>
       </div>
 
       {/* Project Statistics */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className="bg-neutral-900 rounded-lg p-4 text-center">
-          <div className="text-2xl font-bold text-white">{todos.length}</div>
-          <div className="text-sm text-gray-400">Việc cần làm</div>
-        </div>
-        <div className="bg-neutral-900 rounded-lg p-4 text-center">
-          <div className="text-2xl font-bold text-white">{totalTasks}</div>
-          <div className="text-sm text-gray-400">Tổng nhiệm vụ</div>
-        </div>
-      </div>
-
-      {/* Overall Progress */}
-      <div className="bg-neutral-900 rounded-lg p-4 space-y-3">
+      <div className="bg-neutral-900 rounded-lg p-4 space-y-4">
         <h3 className="font-semibold text-white flex items-center gap-2">
           <RiBarChartLine size="1rem" />
-          Tiến độ tổng quan
+          Tổng quan dự án
         </h3>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div className="text-center">
+            <div className="text-lg font-bold text-white">
+              {completedTasks}/{totalTasks}
+            </div>
+            <div className="text-xs text-gray-400">Nhiệm vụ</div>
+          </div>
+          <div className="text-center">
+            <div className="text-lg font-bold text-white">
+              {completedPomodoros}/{totalPomodoros}
+            </div>
+            <div className="text-xs text-gray-400">Pomodoro</div>
+          </div>
+        </div>
+
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
-            <span className="text-gray-400">Hoàn thành</span>
+            <span className="text-gray-400">Tiến độ</span>
             <span className="text-white">{overallProgress}%</span>
           </div>
           <div className="w-full bg-neutral-700 rounded-full h-2">
@@ -125,14 +142,6 @@ const ProjectDetailsView: React.FC<ProjectDetailsViewProps> = ({
               style={{ width: `${overallProgress}%` }}
             />
           </div>
-          <div className="flex justify-between text-xs text-gray-500">
-            <span>
-              {completedTasks}/{totalTasks} nhiệm vụ hoàn thành
-            </span>
-            <span>
-              {completedPomodoros}/{totalPomodoros} pomodoro
-            </span>
-          </div>
         </div>
       </div>
 
@@ -141,7 +150,7 @@ const ProjectDetailsView: React.FC<ProjectDetailsViewProps> = ({
         <div className="space-y-3">
           <h3 className="text-lg font-semibold text-white flex items-center gap-2">
             <FaTasks size="1rem" />
-            Danh sách việc cần làm ({todos.length})
+            Việc cần làm ({todos.length})
           </h3>
           <div className="space-y-3">
             {todos.map((todo) => {
@@ -152,32 +161,34 @@ const ProjectDetailsView: React.FC<ProjectDetailsViewProps> = ({
                 <div
                   key={todo.id}
                   onClick={() => handleTodoClick(todo)}
-                  className="bg-neutral-900 rounded-lg p-4 cursor-pointer hover:bg-neutral-800 transition-colors"
+                  className="bg-neutral-900 rounded-lg p-3 cursor-pointer hover:bg-neutral-800 transition-colors"
                 >
                   <div className="space-y-3">
-                    {/* Todo Header */}
-                    <div className="flex items-start justify-between">
-                      <h4 className="font-medium text-white text-left flex-1 pr-2">
+                    <div className="flex items-start justify-between gap-3">
+                      <h4 className="font-medium text-white flex-1 leading-tight break-words min-w-0">
                         {todo.title}
                       </h4>
-                      <div className="flex flex-col items-end gap-1">
-                        <span
-                          className={`text-xs px-2 py-1 rounded whitespace-nowrap ${
-                            todo.priority === "high"
-                              ? "bg-red-500/20 text-red-400"
-                              : "bg-gray-500/20 text-gray-400"
-                          }`}
-                        >
-                          {getPriorityText(todo.priority)}
-                        </span>
-                      </div>
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
+                          todo.priority === "high"
+                            ? "text-red-400 bg-red-500/20"
+                            : "text-gray-400 bg-gray-500/20"
+                        }`}
+                      >
+                        {getPriorityText(todo.priority)}
+                      </span>
                     </div>
 
-                    {/* Progress */}
-                    <div className="mb-2">
-                      <div className="flex justify-between text-xs text-gray-400 mb-1">
-                        <span>Tiến độ</span>
-                        <span>{progress}%</span>
+                    {todo.description && (
+                      <p className="text-sm text-gray-400 line-clamp-2 break-words">
+                        {todo.description}
+                      </p>
+                    )}
+
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-400">Tiến độ</span>
+                        <span className="text-white">{progress}%</span>
                       </div>
                       <div className="w-full bg-neutral-700 rounded-full h-1.5">
                         <div
@@ -189,13 +200,21 @@ const ProjectDetailsView: React.FC<ProjectDetailsViewProps> = ({
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between text-xs text-gray-400">
-                      {/* Due Date */}
+                    <div className="flex flex-col gap-1 text-xs text-gray-400">
+                      {/* Start Date với thời gian */}
+                      {todo.startDate && (
+                        <div className="flex items-center gap-1">
+                          <RiCalendarLine size="0.75rem" />
+                          <span>Bắt đầu: {formatDateTime(todo.startDate)}</span>
+                        </div>
+                      )}
+
+                      {/* Due Date với thời gian */}
                       {todo.dueDate && (
                         <div className="flex items-center gap-1">
                           <RiCalendarLine size="0.75rem" />
                           <span className={isOverdue ? "text-red-400" : ""}>
-                            Hạn: {formatDate(todo.dueDate)}
+                            Hạn chót: {formatDateTime(todo.dueDate)}
                           </span>
                         </div>
                       )}
