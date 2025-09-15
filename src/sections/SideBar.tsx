@@ -166,7 +166,7 @@ const SideBar: React.FC<SideBarProps> = ({ className }) => {
                 key={project.id}
                 className="flex items-center gap-3 py-2 font-medium hover:bg-neutral-800"
               >
-                <div className="flex justify-start">
+                <div className="flex justify-start items-center">
                   {isActive && (
                     <div className="h-6 w-0.5 rounded-full bg-green-400" />
                   )}

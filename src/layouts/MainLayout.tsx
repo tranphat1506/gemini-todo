@@ -47,14 +47,21 @@ const MainLayout: React.FC<LayoutProps> = ({ children, headerProps }) => {
         <Footer />
       </div>
 
-      {/* Right Sidebar */}
+      {/* Right Sidebar - Desktop */}
       <div
-        className={`hidden sm:block ${
+        className={`hidden md:block ${
           isRightSidebarOpen ? "w-80 lg:w-96" : "w-0"
         } transition-all duration-300`}
       >
         <RightSideBar />
       </div>
+
+      {/* Right Sidebar - Mobile Full Screen */}
+      {isRightSidebarOpen && (
+        <div className="md:hidden fixed inset-0 z-50 bg-black">
+          <RightSideBar className="w-full h-full m-0 rounded-none" />
+        </div>
+      )}
     </div>
   );
 };

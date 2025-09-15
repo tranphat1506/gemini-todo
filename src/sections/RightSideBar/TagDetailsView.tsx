@@ -48,6 +48,19 @@ const TagDetailsView: React.FC<TagDetailsViewProps> = ({
     });
   };
 
+  const getPriorityText = (priority: string) => {
+    switch (priority) {
+      case "high":
+        return "Cao";
+      case "medium":
+        return "Trung bình";
+      case "low":
+        return "Thấp";
+      default:
+        return "Bình thường";
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Tag Info */}
@@ -62,7 +75,7 @@ const TagDetailsView: React.FC<TagDetailsViewProps> = ({
           #{tag.text}
         </div>
         <div className="text-sm text-gray-400">
-          {todos.length} todos • {reminders.length} reminders
+          {todos.length} việc cần làm • {reminders.length} lời nhắc
         </div>
       </div>
 
@@ -70,13 +83,13 @@ const TagDetailsView: React.FC<TagDetailsViewProps> = ({
       <div className="grid grid-cols-2 gap-4">
         <div className="bg-neutral-900 rounded-lg p-3 text-center">
           <div className="text-2xl font-bold text-white">{todos.length}</div>
-          <div className="text-sm text-gray-400">Todos</div>
+          <div className="text-sm text-gray-400">Việc cần làm</div>
         </div>
         <div className="bg-neutral-900 rounded-lg p-3 text-center">
           <div className="text-2xl font-bold text-white">
             {reminders.length}
           </div>
-          <div className="text-sm text-gray-400">Reminders</div>
+          <div className="text-sm text-gray-400">Lời nhắc</div>
         </div>
       </div>
 
@@ -85,11 +98,12 @@ const TagDetailsView: React.FC<TagDetailsViewProps> = ({
         <div className="space-y-3">
           <h3 className="text-lg font-semibold text-white flex items-center gap-2">
             <FaTasks size="1rem" />
-            Todos ({todos.length})
+            Việc cần làm ({todos.length})
           </h3>
           <div className="space-y-2">
             {todos.map((todo) => {
               const progress = todoProgress(todo);
+              const isOverdue = todo.dueDate && todo.dueDate < Date.now();
               return (
                 <div
                   key={todo.id}
@@ -107,36 +121,42 @@ const TagDetailsView: React.FC<TagDetailsViewProps> = ({
                           : "bg-gray-500/20 text-gray-400"
                       }`}
                     >
-                      {todo.priority}
+                      {getPriorityText(todo.priority)}
                     </span>
                   </div>
 
                   {/* Progress */}
                   <div className="mb-2">
                     <div className="flex justify-between text-xs text-gray-400 mb-1">
-                      <span>Progress</span>
+                      <span>Tiến độ</span>
                       <span>{progress}%</span>
                     </div>
                     <div className="w-full bg-neutral-700 rounded-full h-1.5">
                       <div
-                        className="bg-green-400 h-1.5 rounded-full transition-all duration-300"
+                        className={`h-1.5 rounded-full transition-all duration-300 ${
+                          progress === 100 ? "bg-green-400" : "bg-blue-400"
+                        }`}
                         style={{ width: `${progress}%` }}
                       />
                     </div>
                   </div>
 
-                  {/* Due Date */}
-                  {todo.dueDate && (
-                    <div className="flex items-center gap-1 text-xs text-gray-400">
-                      <RiCalendarLine size="0.75rem" />
-                      <span>Due: {formatDate(todo.dueDate)}</span>
-                    </div>
-                  )}
+                  <div className="flex items-center justify-between text-xs text-gray-400">
+                    {/* Due Date */}
+                    {todo.dueDate && (
+                      <div className="flex items-center gap-1">
+                        <RiCalendarLine size="0.75rem" />
+                        <span className={isOverdue ? "text-red-400" : ""}>
+                          Hạn: {formatDate(todo.dueDate)}
+                        </span>
+                      </div>
+                    )}
 
-                  {/* Tasks count */}
-                  <div className="flex items-center gap-1 text-xs text-gray-400 mt-1">
-                    <RiCheckboxCircleLine size="0.75rem" />
-                    <span>{todo.tasks.length} tasks</span>
+                    {/* Tasks count */}
+                    <div className="flex items-center gap-1 text-xs text-gray-400 mt-1">
+                      <RiCheckboxCircleLine size="0.75rem" />
+                      <span>{todo.tasks.length} nhiệm vụ</span>
+                    </div>
                   </div>
                 </div>
               );
@@ -150,7 +170,7 @@ const TagDetailsView: React.FC<TagDetailsViewProps> = ({
         <div className="space-y-3">
           <h3 className="text-lg font-semibold text-white flex items-center gap-2">
             <RiTimeLine size="1rem" />
-            Reminders ({reminders.length})
+            Lời nhắc ({reminders.length})
           </h3>
           <div className="space-y-2">
             {reminders.map((reminder) => (
@@ -171,12 +191,12 @@ const TagDetailsView: React.FC<TagDetailsViewProps> = ({
                 <div className="space-y-1">
                   <div className="flex items-center gap-1 text-xs text-gray-400">
                     <RiTimeLine size="0.75rem" />
-                    <span>{reminder.time}</span>
+                    <span>Thời gian: {reminder.time}</span>
                   </div>
                   {reminder.place && (
                     <div className="flex items-center gap-1 text-xs text-gray-400">
                       <RiMapPinLine size="0.75rem" />
-                      <span>{reminder.place}</span>
+                      <span>Địa điểm: {reminder.place}</span>
                     </div>
                   )}
                 </div>
@@ -190,7 +210,7 @@ const TagDetailsView: React.FC<TagDetailsViewProps> = ({
       {todos.length === 0 && reminders.length === 0 && (
         <div className="text-center py-8 text-gray-400">
           <div className="text-4xl mb-2">🏷️</div>
-          <p>No todos or reminders found with this tag</p>
+          <p>Không tìm thấy việc cần làm hoặc lời nhắc nào với thẻ này</p>
         </div>
       )}
     </div>

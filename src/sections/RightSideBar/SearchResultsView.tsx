@@ -44,6 +44,19 @@ const SearchResultsView: React.FC<SearchResultsViewProps> = ({
     });
   };
 
+  const getPriorityText = (priority: string) => {
+    switch (priority) {
+      case "high":
+        return "Cao";
+      case "medium":
+        return "Trung bình";
+      case "low":
+        return "Thấp";
+      default:
+        return "Bình thường";
+    }
+  };
+
   const totalResults = todos.length + reminders.length;
 
   const highlightText = (text: string, query: string) => {
@@ -69,33 +82,35 @@ const SearchResultsView: React.FC<SearchResultsViewProps> = ({
       <div className="text-center space-y-3">
         <div className="flex items-center justify-center gap-2 text-blue-400">
           <RiSearch2Line size="1.5rem" />
-          <h2 className="text-lg font-semibold">Search Results</h2>
+          <h2 className="text-lg font-semibold">Kết quả tìm kiếm</h2>
         </div>
         <div className="text-sm text-gray-400">
-          {totalResults} result{totalResults !== 1 ? "s" : ""} for "{query}"
+          {totalResults} kết quả{totalResults !== 1 ? "" : ""} cho "{query}"
         </div>
       </div>
 
-      {/* Results Summary */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className="bg-neutral-900 rounded-lg p-3 text-center">
-          <div className="text-2xl font-bold text-white">{todos.length}</div>
-          <div className="text-sm text-gray-400">Todos</div>
-        </div>
-        <div className="bg-neutral-900 rounded-lg p-3 text-center">
-          <div className="text-2xl font-bold text-white">
-            {reminders.length}
+      {/* Summary */}
+      {totalResults > 0 && (
+        <div className="grid grid-cols-2 gap-4">
+          <div className="bg-neutral-900 rounded-lg p-3 text-center">
+            <div className="text-2xl font-bold text-white">{todos.length}</div>
+            <div className="text-sm text-gray-400">Việc cần làm</div>
           </div>
-          <div className="text-sm text-gray-400">Reminders</div>
+          <div className="bg-neutral-900 rounded-lg p-3 text-center">
+            <div className="text-2xl font-bold text-white">
+              {reminders.length}
+            </div>
+            <div className="text-sm text-gray-400">Lời nhắc</div>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Todos Results */}
       {todos.length > 0 && (
         <div className="space-y-3">
           <h3 className="text-lg font-semibold text-white flex items-center gap-2">
             <FaTasks size="1rem" />
-            Todos ({todos.length})
+            Việc cần làm ({todos.length})
           </h3>
           <div className="space-y-2">
             {todos.map((todo) => {
@@ -109,27 +124,21 @@ const SearchResultsView: React.FC<SearchResultsViewProps> = ({
                   className="bg-neutral-900 rounded-lg p-3 cursor-pointer hover:bg-neutral-800 transition-colors"
                 >
                   <div className="flex items-start justify-between mb-2">
-                    <h4 className="font-medium text-white truncate flex-1">
+                    <h4 className="font-medium text-white flex-1 pr-2">
                       {highlightText(todo.title, query)}
                     </h4>
-                    <div className="flex gap-2">
-                      {isOverdue && (
-                        <span className="text-xs px-2 py-1 bg-red-500/20 text-red-400 rounded">
-                          Overdue
-                        </span>
-                      )}
-                      <span
-                        className={`text-xs px-2 py-1 rounded ${
-                          todo.priority === "high"
-                            ? "bg-red-500/20 text-red-400"
-                            : "bg-gray-500/20 text-gray-400"
-                        }`}
-                      >
-                        {todo.priority}
-                      </span>
-                    </div>
+                    <span
+                      className={`text-xs px-2 py-1 rounded whitespace-nowrap ${
+                        todo.priority === "high"
+                          ? "bg-red-500/20 text-red-400"
+                          : "bg-gray-500/20 text-gray-400"
+                      }`}
+                    >
+                      {getPriorityText(todo.priority)}
+                    </span>
                   </div>
 
+                  {/* Description */}
                   {todo.description && (
                     <p className="text-sm text-gray-400 mb-2 line-clamp-2">
                       {highlightText(todo.description, query)}
@@ -139,12 +148,14 @@ const SearchResultsView: React.FC<SearchResultsViewProps> = ({
                   {/* Progress */}
                   <div className="mb-2">
                     <div className="flex justify-between text-xs text-gray-400 mb-1">
-                      <span>Progress</span>
+                      <span>Tiến độ</span>
                       <span>{progress}%</span>
                     </div>
                     <div className="w-full bg-neutral-700 rounded-full h-1.5">
                       <div
-                        className="bg-green-400 h-1.5 rounded-full transition-all duration-300"
+                        className={`h-1.5 rounded-full transition-all duration-300 ${
+                          progress === 100 ? "bg-green-400" : "bg-blue-400"
+                        }`}
                         style={{ width: `${progress}%` }}
                       />
                     </div>
@@ -156,18 +167,15 @@ const SearchResultsView: React.FC<SearchResultsViewProps> = ({
                       <div className="flex items-center gap-1">
                         <RiCalendarLine size="0.75rem" />
                         <span className={isOverdue ? "text-red-400" : ""}>
-                          {formatDate(todo.dueDate)}
+                          Hạn: {formatDate(todo.dueDate)}
                         </span>
                       </div>
                     )}
 
-                    {/* Tasks count */}
+                    {/* Tasks Count */}
                     <div className="flex items-center gap-1">
                       <RiCheckboxCircleLine size="0.75rem" />
-                      <span>
-                        {todo.tasks.filter((t) => t.isCompleted).length}/
-                        {todo.tasks.length}
-                      </span>
+                      <span>{todo.tasks.length} nhiệm vụ</span>
                     </div>
                   </div>
 
@@ -193,7 +201,7 @@ const SearchResultsView: React.FC<SearchResultsViewProps> = ({
                   {todo.project && (
                     <div className="flex items-center gap-1 mt-2 text-xs">
                       <div
-                        className="w-2 h-2 rounded-full"
+                        className="w-3 h-3 rounded-full"
                         style={{ backgroundColor: todo.project.color }}
                       />
                       <span className="text-gray-400">
@@ -213,7 +221,7 @@ const SearchResultsView: React.FC<SearchResultsViewProps> = ({
         <div className="space-y-3">
           <h3 className="text-lg font-semibold text-white flex items-center gap-2">
             <RiTimeLine size="1rem" />
-            Reminders ({reminders.length})
+            Lời nhắc ({reminders.length})
           </h3>
           <div className="space-y-2">
             {reminders.map((reminder) => (
@@ -235,12 +243,14 @@ const SearchResultsView: React.FC<SearchResultsViewProps> = ({
                 <div className="space-y-1">
                   <div className="flex items-center gap-1 text-xs text-gray-400">
                     <RiTimeLine size="0.75rem" />
-                    <span>{reminder.time}</span>
+                    <span>Thời gian: {reminder.time}</span>
                   </div>
                   {reminder.place && (
                     <div className="flex items-center gap-1 text-xs text-gray-400">
                       <RiMapPinLine size="0.75rem" />
-                      <span>{highlightText(reminder.place, query)}</span>
+                      <span>
+                        Địa điểm: {highlightText(reminder.place, query)}
+                      </span>
                     </div>
                   )}
                 </div>
@@ -267,10 +277,7 @@ const SearchResultsView: React.FC<SearchResultsViewProps> = ({
                 {reminder.tasks.length > 0 && (
                   <div className="flex items-center gap-1 mt-2 text-xs text-gray-400">
                     <RiCheckboxCircleLine size="0.75rem" />
-                    <span>
-                      {reminder.tasks.length} linked task
-                      {reminder.tasks.length !== 1 ? "s" : ""}
-                    </span>
+                    <span>{reminder.tasks.length} nhiệm vụ liên kết</span>
                   </div>
                 )}
               </div>
@@ -281,19 +288,12 @@ const SearchResultsView: React.FC<SearchResultsViewProps> = ({
 
       {/* Empty State */}
       {totalResults === 0 && (
-        <div className="text-center py-12 text-gray-400">
-          <div className="text-6xl mb-4">🔍</div>
-          <h3 className="text-lg font-semibold mb-2">No results found</h3>
-          <p>No todos or reminders match your search for "{query}"</p>
-          <div className="mt-4 text-sm text-gray-500">
-            <p>Try searching for:</p>
-            <ul className="mt-2 space-y-1">
-              <li>• Todo or reminder titles</li>
-              <li>• Descriptions</li>
-              <li>• Tag names</li>
-              <li>• Project names</li>
-            </ul>
-          </div>
+        <div className="text-center py-8 text-gray-400">
+          <div className="text-4xl mb-2">🔍</div>
+          <p className="text-lg mb-1">Không tìm thấy kết quả</p>
+          <p className="text-sm text-gray-500">
+            Hãy thử tìm kiếm với từ khóa khác
+          </p>
         </div>
       )}
     </div>

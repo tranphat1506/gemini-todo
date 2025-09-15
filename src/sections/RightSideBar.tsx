@@ -63,7 +63,7 @@ const RightSideBar: React.FC<RightSideBarProps> = ({ className }) => {
   const getTitle = () => {
     switch (content.type) {
       case "tag":
-        return `Tag: #${content.tag.text}`;
+        return `Thẻ: #${content.tag.text}`;
       case "project":
         return content.project.projectName;
       case "todo-detail":
@@ -71,9 +71,9 @@ const RightSideBar: React.FC<RightSideBarProps> = ({ className }) => {
       case "reminder-detail":
         return content.reminder.title;
       case "search-results":
-        return `Search: "${content.query}"`;
+        return `Tìm kiếm: "${content.query}"`;
       default:
-        return "Details";
+        return "Chi tiết";
     }
   };
 
@@ -86,7 +86,11 @@ const RightSideBar: React.FC<RightSideBarProps> = ({ className }) => {
           exit={{ x: "100%" }}
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
           className={clsx(
-            "bg-[#111] rounded-2xl my-4 mr-4 text-white flex flex-col w-80 lg:w-96",
+            "bg-[#111] text-white flex flex-col",
+            // Desktop styles
+            "md:rounded-2xl md:my-4 md:mr-4 md:w-80 lg:md:w-96",
+            // Mobile styles
+            "max-md:w-full max-md:h-full max-md:m-0 max-md:rounded-none",
             className
           )}
         >
