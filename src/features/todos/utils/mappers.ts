@@ -1,12 +1,12 @@
 import type {
-  Tag,
+  TagEntity,
   TaskEntity,
   TaskViewModel,
   TodoEntity,
   TodoViewModel,
   ReminderEntity,
   ReminderViewModel,
-  Project,
+  ProjectEntity,
   ProjectViewModel,
 } from "../types";
 
@@ -15,7 +15,10 @@ import type {
 // =======================================
 
 // Resolve tagIds -> Tag[]
-const resolveTags = (tagIds: string[] | undefined, allTags: Tag[]): Tag[] => {
+const resolveTags = (
+  tagIds: string[] | undefined,
+  allTags: TagEntity[]
+): TagEntity[] => {
   if (!tagIds || tagIds.length === 0) return [];
   return allTags.filter((tag) => tagIds.includes(tag.id));
 };
@@ -26,7 +29,7 @@ const resolveTags = (tagIds: string[] | undefined, allTags: Tag[]): Tag[] => {
 
 export function toTaskViewModel(
   entity: TaskEntity,
-  allTags: Tag[]
+  allTags: TagEntity[]
 ): TaskViewModel {
   return {
     ...entity,
@@ -41,8 +44,8 @@ export function toTaskViewModel(
 export function toTodoViewModel(
   entity: TodoEntity,
   taskEntities: TaskEntity[],
-  allTags: Tag[],
-  allProjects: Project[]
+  allTags: TagEntity[],
+  allProjects: ProjectEntity[]
 ): TodoViewModel {
   const tasks = taskEntities
     .filter((t) => t.todoId === entity.id)
@@ -67,7 +70,7 @@ export function toTodoViewModel(
 export function toReminderViewModel(
   entity: ReminderEntity,
   taskEntities: TaskEntity[],
-  allTags: Tag[]
+  allTags: TagEntity[]
 ): ReminderViewModel {
   const tasks = entity.taskIds
     ? taskEntities
@@ -82,6 +85,6 @@ export function toReminderViewModel(
   };
 }
 
-export function toProjectViewModel(project: Project): ProjectViewModel {
+export function toProjectViewModel(project: ProjectEntity): ProjectViewModel {
   return { ...project };
 }

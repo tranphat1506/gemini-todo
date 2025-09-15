@@ -4,6 +4,8 @@ import Footer from "@/sections/Footer";
 import Header, { type HeaderProps } from "@/sections/Header";
 import { Outlet } from "react-router";
 import SideBar from "@/sections/SideBar";
+import RightSideBar from "@/sections/RightSideBar";
+import { useAppSelector } from "@/hooks/storeHooks";
 
 interface LayoutProps {
   children?: React.ReactNode;
@@ -13,6 +15,9 @@ interface LayoutProps {
 const MainLayout: React.FC<LayoutProps> = ({ children, headerProps }) => {
   const bottomNavRef = useRef<HTMLDivElement | null>(null);
   const [bottomNavHeight, setBottomNavHeight] = useState(0);
+  const { isOpen: isRightSidebarOpen } = useAppSelector(
+    (state) => state.rightSidebar
+  );
 
   useEffect(() => {
     if (bottomNavRef.current) {
@@ -21,8 +26,11 @@ const MainLayout: React.FC<LayoutProps> = ({ children, headerProps }) => {
   }, []);
 
   return (
-    <div className="grid grid-cols-[auto_1fr] min-h-screen">
+    <div className="grid grid-cols-[auto_1fr_auto] min-h-screen">
+      {/* Left Sidebar */}
       <SideBar className="hidden sm:block" />
+
+      {/* Main Content */}
       <div className="sm:w-auto w-screen flex flex-col">
         <Header className="sm:hidden" {...headerProps} />
         <div
@@ -37,6 +45,15 @@ const MainLayout: React.FC<LayoutProps> = ({ children, headerProps }) => {
           className="sm:hidden fixed bottom-0 left-0 w-full z-50"
         />
         <Footer />
+      </div>
+
+      {/* Right Sidebar */}
+      <div
+        className={`hidden sm:block ${
+          isRightSidebarOpen ? "w-80 lg:w-96" : "w-0"
+        } transition-all duration-300`}
+      >
+        <RightSideBar />
       </div>
     </div>
   );

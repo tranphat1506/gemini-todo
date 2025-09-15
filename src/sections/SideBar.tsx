@@ -13,12 +13,24 @@ import {
 import { useAppSelector } from "@/hooks/storeHooks";
 import { lazy, Suspense, useMemo, useState } from "react";
 import {
+  createMockReminders,
+  createMockTodos,
   mockProjects,
   mockTags,
 } from "@/features/todos/utils/mock.data.generator";
 import { getContrastColor } from "@/utils/color";
 const Avatar = lazy(() => import("@/components/Avatar"));
-
+import { useAppDispatch } from "@/hooks/storeHooks";
+import { showTagDetails } from "@/features/ui/rightSidebar.slice";
+import type {
+  ReminderViewModel,
+  TagEntity,
+  TodoViewModel,
+} from "@/features/todos/types";
+import {
+  toReminderViewModel,
+  toTodoViewModel,
+} from "@/features/todos/utils/mappers";
 interface SideBarProps {
   className?: string;
 }
@@ -42,6 +54,29 @@ const SideBar: React.FC<SideBarProps> = ({ className }) => {
   const tags = useMemo(() => {
     return mockTags;
   }, []);
+  const dispatch = useAppDispatch();
+  const allTodos = useMemo(() => {
+    return createMockTodos();
+  }, []);
+  const allReminders = useMemo(() => {
+    return createMockReminders(10);
+  }, []);
+  const handleTagClick = (tag: TagEntity) => {
+    const todosWithTag: TodoViewModel[] = allTodos.todos
+      .filter((t) => t.tagIds?.includes(tag.id))
+      .map((t) => toTodoViewModel(t, allTodos.tasks, mockTags, mockProjects));
+    const remindersWithTag: ReminderViewModel[] = allReminders
+      .filter((t) => t.tagIds?.includes(tag.id))
+      .map((r) => toReminderViewModel(r, allTodos.tasks, mockTags));
+
+    dispatch(
+      showTagDetails({
+        tag,
+        todos: todosWithTag,
+        reminders: remindersWithTag,
+      })
+    );
+  };
   return (
     <div
       className={clsx(
@@ -161,6 +196,7 @@ const SideBar: React.FC<SideBarProps> = ({ className }) => {
             {tags.map((tag) => (
               <button
                 key={tag.id}
+                onClick={() => handleTagClick(tag)}
                 className="px-3 py-1 rounded-full text-sm font-medium text-white hover:scale-[1.085] transition-transform"
                 style={{
                   backgroundColor: tag.color,

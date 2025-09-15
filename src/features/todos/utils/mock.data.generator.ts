@@ -3,8 +3,8 @@ import type {
   TaskEntity,
   PomodoroSession,
   ReminderEntity,
-  Tag,
-  Project,
+  TagEntity,
+  ProjectEntity,
 } from "../types";
 
 // Utility: tạo id random
@@ -18,20 +18,74 @@ const daysFromNow = (days: number) => {
 };
 
 // ========== Mock Tags ==========
-export const mockTags: Tag[] = [
-  { id: "t1", text: "UI", color: "#3b82f6" },
-  { id: "t2", text: "Backend", color: "#10b981" },
-  { id: "t3", text: "Planning", color: "#f59e0b" },
-  { id: "t4", text: "Research", color: "#8b5cf6" },
-  { id: "t5", text: "Testing", color: "#ef4444" },
-  { id: "t6", text: "Meeting", color: "#f97316" },
+export const mockTags: TagEntity[] = [
+  {
+    id: "t1",
+    text: "UI",
+    color: "#3b82f6",
+    createdAt: daysFromNow(0),
+    updatedAt: daysFromNow(0),
+  },
+  {
+    id: "t2",
+    text: "Backend",
+    color: "#10b981",
+    createdAt: daysFromNow(0),
+    updatedAt: daysFromNow(0),
+  },
+  {
+    id: "t3",
+    text: "Planning",
+    color: "#f59e0b",
+    createdAt: daysFromNow(0),
+    updatedAt: daysFromNow(0),
+  },
+  {
+    id: "t4",
+    text: "Research",
+    color: "#8b5cf6",
+    createdAt: daysFromNow(0),
+    updatedAt: daysFromNow(0),
+  },
+  {
+    id: "t5",
+    text: "Testing",
+    color: "#ef4444",
+    createdAt: daysFromNow(0),
+    updatedAt: daysFromNow(0),
+  },
+  {
+    id: "t6",
+    text: "Meeting",
+    color: "#f97316",
+    createdAt: daysFromNow(0),
+    updatedAt: daysFromNow(0),
+  },
 ];
 
 // ========== Mock Projects ==========
-export const mockProjects: Project[] = [
-  { id: "p1", projectName: "Hackathon App", color: "#06b6d4" },
-  { id: "p2", projectName: "Study React", color: "#3b82f6" },
-  { id: "p3", projectName: "Personal Goals", color: "#10b981" },
+export const mockProjects: ProjectEntity[] = [
+  {
+    id: "p1",
+    projectName: "Hackathon App",
+    color: "#06b6d4",
+    createdAt: daysFromNow(0),
+    updatedAt: daysFromNow(0),
+  },
+  {
+    id: "p2",
+    projectName: "Study React",
+    color: "#3b82f6",
+    createdAt: daysFromNow(0),
+    updatedAt: daysFromNow(0),
+  },
+  {
+    id: "p3",
+    projectName: "Personal Goals",
+    color: "#10b981",
+    createdAt: daysFromNow(0),
+    updatedAt: daysFromNow(0),
+  },
 ];
 
 // Helper random
